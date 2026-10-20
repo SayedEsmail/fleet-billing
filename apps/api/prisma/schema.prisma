@@ -1,0 +1,119 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OPERATOR
+  PARENT
+}
+
+enum TripDirection {
+  MORNING
+  AFTERNOON
+}
+
+enum BillingPeriod {
+  MONTHLY
+  TERM
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELED
+}
+
+/// One row per Supabase Auth user. `id` is the auth user id (JWT `sub`).
+model Profile {
+  id            String         @id @db.Uuid
+  email         String         @unique
+  fullName      String         @map("full_name")
+  role          Role           @default(PARENT)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  children      Child[]
+  subscriptions Subscription[]
+
+  @@map("profiles")
+}
+
+model Bus {
+  id          String   @id @default(uuid()) @db.Uuid
+  plateNumber String   @unique @map("plate_number")
+  capacity    Int
+  driverName  String   @map("driver_name")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  trips       Trip[]
+
+  @@map("buses")
+}
+
+model Trip {
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String
+  direction     TripDirection
+  /// Local departure time, "HH:mm".
+  departureTime String         @map("departure_time")
+  busId         String         @map("bus_id") @db.Uuid
+  bus           Bus            @relation(fields: [busId], references: [id], onDelete: Restrict)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  subscriptions Subscription[]
+
+  @@index([busId])
+  @@map("trips")
+}
+
+model Child {
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String
+  grade         Int
+  parentId      String         @map("parent_id") @db.Uuid
+  parent        Profile        @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now()) @map("created_at")
+
+  @@index([parentId])
+  @@map("children")
+}
+
+/// RLS is enabled on this table (see the rls migration): parents can only read their own rows.
+model Subscription {
+  id                      String             @id @default(uuid()) @db.Uuid
+  parentId                String             @map("parent_id") @db.Uuid
+  parent                  Profile            @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  tripId                  String             @map("trip_id") @db.Uuid
+  trip                    Trip               @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  children                Child[]
+  period                  BillingPeriod
+  childrenCount           Int                @map("children_count")
+  amountCents             Int                @map("amount_cents")
+  currency                String             @default("eur")
+  status                  SubscriptionStatus @default(PENDING)
+  stripeCheckoutSessionId String?            @unique @map("stripe_checkout_session_id")
+  stripePaymentIntentId   String?            @map("stripe_payment_intent_id")
+  currentPeriodStart      DateTime?          @map("current_period_start")
+  currentPeriodEnd        DateTime?          @map("current_period_end")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+
+  @@index([parentId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+/// Stripe retries webhooks; we record processed event ids to stay idempotent.
+model StripeEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@map("stripe_events")
+}
