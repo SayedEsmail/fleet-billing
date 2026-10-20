@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, Max, Min } from 'class-validator';
+import { Public } from '../auth/decorators.js';
 import { CURRENCY, MAX_CHILDREN, PLANS, quote, siblingDiscountPercent, type BillingPeriod } from '../pricing/pricing.js';
 
 class QuoteQuery {
@@ -15,6 +16,7 @@ class QuoteQuery {
 }
 
 /** Public, read-only pricing info: the web app shows these numbers but never computes them. */
+@Public()
 @Controller('plans')
 export class PlansController {
   @Get()

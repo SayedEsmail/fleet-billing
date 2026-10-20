@@ -9,6 +9,11 @@ export class Env {
   @IsUrl({ require_tld: false })
   SUPABASE_URL: string;
 
+  /** Defaults to `${SUPABASE_URL}/auth/v1/.well-known/jwks.json`. */
+  @IsOptional()
+  @IsUrl({ require_tld: false })
+  SUPABASE_JWKS_URL?: string;
+
   /** Only needed if the Supabase project still signs JWTs with the legacy HS256 secret. */
   @IsOptional()
   @IsString()

@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
+import { Roles } from '../auth/decorators.js';
 import { CreateBusDto, UpdateBusDto } from './buses.dto.js';
 import { BusesService } from './buses.service.js';
 
 @Controller('buses')
+@Roles('OPERATOR')
 export class BusesController {
   constructor(private readonly buses: BusesService) {}
 
