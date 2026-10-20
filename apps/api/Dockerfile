@@ -13,7 +13,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm --filter @fleet/api build
 
 # The runtime keeps the Prisma CLI and tsx so the same image can run
-# `migrate deploy` and the seed (docker compose, Render). Simplicity over size.
+# `migrate deploy` and the seed (docker compose). Simplicity over size.
 FROM node:24-alpine AS runtime
 ENV NODE_ENV=production PORT=4000
 WORKDIR /repo
