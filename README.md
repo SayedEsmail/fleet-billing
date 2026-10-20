@@ -94,10 +94,11 @@ pnpm db:seed                        # synthetic data + demo login users
 pnpm dev                            # api :4000, web :3000
 ```
 
-Forward Stripe events to the API in a second terminal:
+Forward Stripe events to the API in a second terminal. The script passes `STRIPE_SECRET_KEY` from `.env.local` to the CLI, so it always targets the same Stripe account as the API. Put the `whsec_…` it prints into `STRIPE_WEBHOOK_SECRET`:
 
-```bash
-stripe listen --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_succeeded,checkout.session.async_payment_failed --forward-to localhost:4000/stripe/webhook
+```powershell
+.scriptsstripe-listen.ps1                 # stripe listen → localhost:4000/stripe/webhook
+.scriptsstripe-resend.ps1 evt_123         # replay an event you missed
 ```
 
 ### With Docker
