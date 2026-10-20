@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "title": "Fleet Billing",
+    "description": "Subscriptions and billing for a school bus operator"
+  },
+  "common": {
+    "appName": "Fleet Billing",
+    "signOut": "Sign out",
+    "switchLanguage": "العربية",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "loading": "Loading…",
+    "confirmDelete": "Delete this item?",
+    "demoNotice": "Demo project · all data is synthetic · Stripe test mode"
+  },
+  "login": {
+    "heading": "School transport, billed simply",
+    "subheading": "Operators manage buses and trips. Parents pick a plan and pay online.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "error": "Wrong email or password",
+    "tryAs": "Try the demo as",
+    "operator": "Operator",
+    "parent": "Parent"
+  },
+  "enums": {
+    "status": { "PENDING": "Pending payment", "ACTIVE": "Active", "EXPIRED": "Expired", "CANCELED": "Canceled" },
+    "period": { "MONTHLY": "Monthly", "TERM": "Term (4 months)" },
+    "direction": { "MORNING": "Morning", "AFTERNOON": "Afternoon" }
+  },
+  "operator": {
+    "title": "Operator dashboard",
+    "stats": {
+      "mrr": "Monthly recurring revenue",
+      "active": "Active subscriptions",
+      "pending": "Awaiting payment",
+      "riders": "Children riding",
+      "buses": "Buses in service",
+      "utilization": "Seat utilization by trip",
+      "seats": "{taken} / {capacity} seats"
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "all": "All",
+      "parent": "Parent",
+      "trip": "Trip",
+      "plan": "Plan",
+      "children": "Children",
+      "amount": "Amount",
+      "status": "Status",
+      "period": "Current period",
+      "empty": "No subscriptions match this filter."
+    },
+    "fleet": {
+      "buses": "Buses",
+      "trips": "Trips",
+      "plate": "Plate",
+      "capacity": "Seats",
+      "driver": "Driver",
+      "active": "In service",
+      "name": "Route",
+      "direction": "Direction",
+      "departure": "Departs",
+      "bus": "Bus",
+      "newBus": "New bus",
+      "newTrip": "New trip",
+      "yes": "Yes",
+      "no": "No"
+    }
+  },
+  "parent": {
+    "title": "My subscription",
+    "checkoutSuccess": "Payment received. Your subscription becomes active as soon as Stripe confirms it — usually within seconds.",
+    "checkoutCanceled": "Checkout was canceled. Nothing was charged.",
+    "mine": {
+      "title": "My subscriptions",
+      "empty": "You have no subscriptions yet. Choose a plan below.",
+      "validUntil": "Valid until {date}",
+      "awaiting": "Waiting for payment confirmation",
+      "children": "{count, plural, one {# child} other {# children}}"
+    },
+    "children": {
+      "title": "My children",
+      "name": "Name",
+      "grade": "Grade",
+      "gradeN": "Grade {grade}",
+      "add": "Add child",
+      "empty": "Add your children to subscribe them."
+    },
+    "plan": {
+      "title": "Choose a plan",
+      "trip": "Trip",
+      "period": "Billing period",
+      "whichChildren": "Children",
+      "perChild": "{amount} per child",
+      "siblingNote": "Sibling discount: 10% for the 2nd child, 15% from the 3rd.",
+      "subtotal": "Subtotal",
+      "discount": "Sibling discount",
+      "total": "Total",
+      "pay": "Continue to payment",
+      "redirecting": "Redirecting to Stripe…",
+      "pickChild": "Select at least one child."
+    }
+  }
+}

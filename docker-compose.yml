@@ -1,0 +1,61 @@
+# Local stack: Postgres + API + web.
+#
+#   docker compose --env-file .env.local up --build
+#
+# The database is local; login and payments still use your Supabase Auth and
+# Stripe test-mode projects from .env.local. The migrate service seeds the
+# local DB and links the demo users to their Supabase Auth ids.
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fleet
+    ports: ['5432:5432']
+    volumes: [db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d fleet']
+      interval: 3s
+      retries: 20
+
+  migrate:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    env_file: [{ path: .env.local, required: false }]
+    environment: &db
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/fleet
+      DIRECT_URL: postgresql://postgres:postgres@db:5432/fleet
+    command: sh -c "node_modules/.bin/prisma migrate deploy && node_modules/.bin/tsx prisma/seed.ts"
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    env_file: [{ path: .env.local, required: false }]
+    environment:
+      <<: *db
+      WEB_URL: http://localhost:3000
+      SUPABASE_URL: ${SUPABASE_URL:-${NEXT_PUBLIC_SUPABASE_URL:-https://placeholder.supabase.co}}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_placeholder}
+    ports: ['4000:4000']
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-https://placeholder.supabase.co}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-sb_publishable_placeholder}
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+        NEXT_PUBLIC_DEMO_PASSWORD: ${NEXT_PUBLIC_DEMO_PASSWORD:-}
+    environment:
+      # Server Components call the API over the compose network; the browser uses localhost.
+      API_URL: http://api:4000
+    ports: ['3000:3000']
+    depends_on: [api]
+
+volumes:
+  db-data:
